@@ -1,0 +1,7 @@
+---
+title: Valid Front Matter
+author: Test Author
+---
+book:
+  base_dir: [invalid yaml
+    unclosed bracket

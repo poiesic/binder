@@ -1,0 +1,20 @@
+---
+title: Benthamville
+short_title: Benthamville
+author: Kevin Smith
+author_lastname: Smith
+contact_name: Kevin Smith
+contact_address: 6513 Rainbow Court
+contact_city_state_zip: Raleigh, NC 27612
+contact_phone: (919) 345-4521
+contact_email: kevin@poiesic.com
+---
+book:
+    base_dir: "cmd/binder/testdata/manuscript"
+    chapters:
+        - scenes:
+              - "foo"
+              - "baz"
+        - scenes:
+              - "bar"
+              - "quux"

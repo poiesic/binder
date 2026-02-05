@@ -1,0 +1,20 @@
+---
+title: Test Book
+short_title: Test
+author: Test Author
+author_lastname: Author
+contact_name: Test Contact
+contact_address: 123 Test St
+contact_city_state_zip: Test City, TS 12345
+contact_phone: (555) 123-4567
+contact_email: test@example.com
+---
+book:
+  base_dir: "testdata/manuscript"
+  chapters:
+    - scenes:
+        - "foo"
+        - "baz"
+    - scenes:
+        - "bar"
+        - "quux"

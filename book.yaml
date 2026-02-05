@@ -1,0 +1,9 @@
+book:
+    base_dir: "cmd/binder/testdata/manuscript"
+    chapters:
+        - scenes:
+              - "foo"
+              - "baz"
+        - scenes:
+              - "bar"
+              - "quux"

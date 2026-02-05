@@ -1,0 +1,16 @@
+---
+title: Book With Subdirs
+author: Test Author
+---
+book:
+  base_dir: "base"
+  chapters:
+    - subdir: "part1"
+      scenes:
+        - "scene1"
+        - "scene2"
+    - subdir: "part2"
+      scenes:
+        - "scene3"
+    - scenes:
+        - "scene4"

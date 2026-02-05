@@ -1,0 +1,16 @@
+---
+title: Book With Named Chapters
+author: Test Author
+---
+book:
+  base_dir: "testdata/manuscript"
+  chapters:
+    - name: "Prologue"
+      scenes:
+        - "foo"
+    - scenes:
+        - "bar"
+        - "baz"
+    - name: "Epilogue"
+      scenes:
+        - "quux"

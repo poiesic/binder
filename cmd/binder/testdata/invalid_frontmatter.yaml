@@ -1,0 +1,7 @@
+---
+title: [invalid yaml
+  unclosed bracket
+---
+book:
+  base_dir: "manuscript"
+  chapters: []

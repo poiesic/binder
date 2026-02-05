@@ -30,6 +30,7 @@ func writeMarkdownScenes(fd *os.File, sceneFiles []string) error {
 
 func markdown(ctx context.Context, cmd *cli.Command) error {
 	outdir := cmd.String("outdir")
+	_ = os.RemoveAll(outdir)
 	if err := os.MkdirAll(outdir, 0755); err != nil {
 		return err
 	}
@@ -39,18 +40,19 @@ func markdown(ctx context.Context, cmd *cli.Command) error {
 	}
 	cnum := 1
 	for chapter := range book.GetChapters() {
-		fmt.Printf("chapter: %s\n", chapter.Heading)
 		if err := chapter.Validate(); err != nil {
 			return err
 		}
 		chapterOutPath := filepath.Join(outdir, fmt.Sprintf("%03d-%s.md", cnum, chapter.HeadingToFilename()))
 		cnum += 1
-		fd, err := os.OpenFile(chapterOutPath, os.O_CREATE|os.O_WRONLY, 0644)
+		fd, err := os.OpenFile(chapterOutPath, os.O_CREATE|os.O_WRONLY|os.O_SYNC, 0644)
 		if err != nil {
 			return err
 		}
-		if _, err := fmt.Fprintf(fd, "# %s\n\n", chapter.Heading); err != nil {
-			return err
+		if chapter.Heading != "" {
+			if _, err := fmt.Fprintf(fd, "# %s\n\n", chapter.Heading); err != nil {
+				return err
+			}
 		}
 		if err := writeMarkdownScenes(fd, chapter.Scenes); err != nil {
 			return err

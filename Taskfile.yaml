@@ -1,0 +1,74 @@
+version: '3'
+
+vars:
+  BINARY_NAME: binder
+  BUILD_DIR: build
+
+tasks:
+  default:
+    desc: Build the project
+    cmds:
+      - task: build
+
+  build:
+    desc: Build the binder binary
+    cmds:
+      - go build -o {{.BUILD_DIR}}/{{.BINARY_NAME}} ./cmd/binder
+    sources:
+      - cmd/binder/*.go
+      - go.mod
+      - go.sum
+    generates:
+      - '{{.BUILD_DIR}}/{{.BINARY_NAME}}'
+
+  test:
+    desc: Run all tests
+    cmds:
+      - go test -v ./...
+
+  test:short:
+    desc: Run tests without verbose output
+    cmds:
+      - go test ./...
+
+  test:cover:
+    desc: Run tests with coverage report
+    cmds:
+      - go test -coverprofile={{.BUILD_DIR}}/coverage.out ./...
+      - go tool cover -html={{.BUILD_DIR}}/coverage.out -o {{.BUILD_DIR}}/coverage.html
+    generates:
+      - '{{.BUILD_DIR}}/coverage.out'
+      - '{{.BUILD_DIR}}/coverage.html'
+
+  clean:
+    desc: Remove build artifacts
+    cmds:
+      - rm -rf {{.BUILD_DIR}}
+
+  lint:
+    desc: Run golangci-lint
+    cmds:
+      - golangci-lint run ./...
+
+  fmt:
+    desc: Format Go code
+    cmds:
+      - go fmt ./...
+
+  vet:
+    desc: Run go vet
+    cmds:
+      - go vet ./...
+
+  mod:tidy:
+    desc: Tidy go modules
+    cmds:
+      - go mod tidy
+
+  all:
+    desc: Run fmt, vet, test, and build
+    cmds:
+      - task: fmt
+      - task: vet
+      - task: test:short
+      - task: build

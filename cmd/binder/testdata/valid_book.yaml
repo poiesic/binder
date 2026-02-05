@@ -10,11 +10,17 @@ contact_phone: (555) 123-4567
 contact_email: test@example.com
 ---
 book:
-  base_dir: "testdata/manuscript"
-  chapters:
-    - scenes:
-        - "foo"
-        - "baz"
-    - scenes:
-        - "bar"
-        - "quux"
+    base_dir: "manuscript"
+    chapters:
+        - interlude: true
+          scenes:
+              - "interlude1"
+        - scenes:
+              - "foo"
+              - "baz"
+        - interlude: true
+          scenes:
+              - "interlude2"
+        - scenes:
+              - "bar"
+              - "quux"

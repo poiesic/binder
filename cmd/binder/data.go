@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"iter"
 	"os"
@@ -27,9 +28,10 @@ type FrontMatter struct {
 }
 
 type Chapter struct {
-	Name   string   `yaml:"name"`
-	Subdir string   `yaml:"subdir"`
-	Scenes []string `yaml:"scenes"`
+	Name      string   `yaml:"name"`
+	Interlude bool     `yaml:"interlude,omitempty"`
+	Subdir    string   `yaml:"subdir"`
+	Scenes    []string `yaml:"scenes"`
 }
 
 type Book struct {
@@ -38,8 +40,9 @@ type Book struct {
 }
 
 type IteratedChapter struct {
-	Heading string
-	Scenes  []string
+	Filename string
+	Heading  string
+	Scenes   []string
 }
 
 func (ic IteratedChapter) Validate() error {
@@ -52,6 +55,9 @@ func (ic IteratedChapter) Validate() error {
 }
 
 func (ic IteratedChapter) HeadingToFilename() string {
+	if ic.Heading == "" {
+		return "interlude"
+	}
 	return strings.ToLower(strings.ReplaceAll(ic.Heading, " ", "-"))
 }
 
@@ -72,8 +78,10 @@ func (b *Book) GetChapters() iter.Seq[IteratedChapter] {
 			if chapter.Name != "" {
 				ic.Heading = caser.String(chapter.Name)
 			} else {
-				ic.Heading = fmt.Sprintf("Chapter %s", caser.String(num2words.Convert(cn)))
-				cn += 1
+				if !chapter.Interlude {
+					ic.Heading = fmt.Sprintf("Chapter %s", caser.String(num2words.Convert(cn)))
+					cn += 1
+				}
 			}
 			for i, s := range chapter.Scenes {
 				ic.Scenes[i] = fmt.Sprintf("%s.md", filepath.Join(chapterBaseDir, s))
@@ -103,6 +111,18 @@ func LoadBook(fileName string) (*FrontMatter, *Book, error) {
 	if err := decoder.Decode(bs); err != nil {
 		return nil, nil, err
 	}
+	inputDir := filepath.Dir(fileName)
 	book := &(bs.Book)
+	relativeDir := filepath.Join(inputDir, book.BaseDir)
+	info, err := os.Stat(relativeDir)
+	if err != nil {
+		if errors.Is(err, os.ErrNotExist) {
+			return fm, book, nil
+		}
+		return nil, nil, err
+	}
+	if info.IsDir() {
+		book.BaseDir = relativeDir
+	}
 	return fm, book, nil
 }

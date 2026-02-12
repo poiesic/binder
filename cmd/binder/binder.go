@@ -32,6 +32,11 @@ func main() {
 						Usage:     "output directory",
 						Required:  true,
 					},
+					&cli.BoolFlag{
+						Name:    "wordcount",
+						Aliases: []string{"w"},
+						Usage:   "print word count for each scene",
+					},
 				},
 			},
 		},

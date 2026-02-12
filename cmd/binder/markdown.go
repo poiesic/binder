@@ -4,7 +4,9 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
+	"strings"
 
 	"github.com/urfave/cli/v3"
 )
@@ -28,8 +30,22 @@ func writeMarkdownScenes(fd *os.File, sceneFiles []string) error {
 	return nil
 }
 
+func sceneWordCount(path string) (string, error) {
+	out, err := exec.Command("wc", "-w", path).Output()
+	if err != nil {
+		return "", err
+	}
+	// wc -w outputs "  123 path/to/file", grab just the count
+	fields := strings.Fields(strings.TrimSpace(string(out)))
+	if len(fields) == 0 {
+		return "0", nil
+	}
+	return fields[0], nil
+}
+
 func markdown(ctx context.Context, cmd *cli.Command) error {
 	outdir := cmd.String("outdir")
+	wordcount := cmd.Bool("wordcount")
 	_ = os.RemoveAll(outdir)
 	if err := os.MkdirAll(outdir, 0755); err != nil {
 		return err
@@ -52,6 +68,15 @@ func markdown(ctx context.Context, cmd *cli.Command) error {
 		if chapter.Heading != "" {
 			if _, err := fmt.Fprintf(fd, "# %s\n\n", chapter.Heading); err != nil {
 				return err
+			}
+		}
+		if wordcount {
+			for _, scene := range chapter.Scenes {
+				wc, err := sceneWordCount(scene)
+				if err != nil {
+					return err
+				}
+				fmt.Printf("%s: %s words\n", filepath.Base(scene), wc)
 			}
 		}
 		if err := writeMarkdownScenes(fd, chapter.Scenes); err != nil {

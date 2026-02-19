@@ -3,7 +3,7 @@ title: Book With Named Chapters
 author: Test Author
 ---
 book:
-  base_dir: "testdata/manuscript"
+  base_dir: "manuscript"
   chapters:
     - name: "Prologue"
       scenes:

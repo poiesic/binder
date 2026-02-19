@@ -2,8 +2,10 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"os"
 
+	"github.com/poiesic/binder"
 	"github.com/urfave/cli/v3"
 )
 
@@ -45,4 +47,20 @@ func main() {
 	if err := cmd.Run(context.Background(), os.Args); err != nil {
 		panic(err)
 	}
+}
+
+func markdown(ctx context.Context, cmd *cli.Command) error {
+	config := binder.AssemblyConfig{
+		InputFile: cmd.String("input"),
+		OutputDir: cmd.String("outdir"),
+		WordCount: cmd.Bool("wordcount"),
+	}
+	_, counts, err := binder.AssembleMarkdown(config)
+	if err != nil {
+		return err
+	}
+	for _, wc := range counts {
+		fmt.Println(binder.FormatWordCount(wc))
+	}
+	return nil
 }

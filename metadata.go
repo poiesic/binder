@@ -1,4 +1,4 @@
-package main
+package binder
 
 import (
 	"os"
@@ -7,7 +7,7 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-func writeMetadata(fm *FrontMatter, outdir string) error {
+func WriteMetadata(fm *FrontMatter, outdir string) error {
 	contents, err := yaml.Marshal(fm)
 	if err != nil {
 		return err

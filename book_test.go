@@ -1,4 +1,4 @@
-package main
+package binder
 
 import (
 	"bytes"
@@ -58,7 +58,6 @@ contact_email: kevin@poiesic.com
 	assert.Equal(t, "Benthamville", fm.Title)
 	assert.Equal(t, "Benthamville", fm.ShortTitle)
 	assert.Equal(t, "Kevin Smith", fm.Author)
-	// This will fail because the struct expects "author_last_name" but YAML has "author_lastname"
 	assert.Equal(t, "Smith", fm.AuthorLastName, "AuthorLastName should be populated from author_lastname")
 	assert.Equal(t, "Kevin Smith", fm.ContactName)
 	assert.Equal(t, "6513 Rainbow Court", fm.ContactAddress)

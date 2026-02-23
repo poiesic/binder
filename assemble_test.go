@@ -141,7 +141,7 @@ func TestWriteMarkdownScenes(t *testing.T) {
 		"testdata/manuscript/foo.md",
 		"testdata/manuscript/bar.md",
 	}
-	err = WriteMarkdownScenes(fd, scenes)
+	err = WriteMarkdownScenes(fd, scenes, false)
 	require.NoError(t, err)
 	fd.Close()
 
@@ -152,6 +152,7 @@ func TestWriteMarkdownScenes(t *testing.T) {
 	assert.Contains(t, text, "This is foo.")
 	assert.Contains(t, text, "***")
 	assert.Contains(t, text, "This is bar.")
+	assert.NotContains(t, text, "## foo")
 }
 
 func TestWriteMarkdownScenes_SingleScene(t *testing.T) {
@@ -160,7 +161,7 @@ func TestWriteMarkdownScenes_SingleScene(t *testing.T) {
 	require.NoError(t, err)
 
 	scenes := []string{"testdata/manuscript/foo.md"}
-	err = WriteMarkdownScenes(fd, scenes)
+	err = WriteMarkdownScenes(fd, scenes, false)
 	require.NoError(t, err)
 	fd.Close()
 
@@ -170,6 +171,46 @@ func TestWriteMarkdownScenes_SingleScene(t *testing.T) {
 	text := string(content)
 	assert.Contains(t, text, "This is foo.")
 	assert.NotContains(t, text, "***", "single scene should have no scene break")
+}
+
+func TestWriteMarkdownScenes_WithSceneHeadings(t *testing.T) {
+	outFile := filepath.Join(t.TempDir(), "test.md")
+	fd, err := os.OpenFile(outFile, os.O_CREATE|os.O_WRONLY, 0644)
+	require.NoError(t, err)
+
+	scenes := []string{
+		"testdata/manuscript/foo.md",
+		"testdata/manuscript/bar.md",
+	}
+	err = WriteMarkdownScenes(fd, scenes, true)
+	require.NoError(t, err)
+	fd.Close()
+
+	content, err := os.ReadFile(outFile)
+	require.NoError(t, err)
+
+	text := string(content)
+	assert.Contains(t, text, "## foo\n\nThis is foo.")
+	assert.Contains(t, text, "## bar\n\nThis is bar.")
+}
+
+func TestAssembleMarkdown_WithSceneHeadings(t *testing.T) {
+	outdir := t.TempDir()
+
+	config := AssemblyConfig{
+		InputFile:     "testdata/valid_book.yaml",
+		OutputDir:     outdir,
+		SceneHeadings: true,
+	}
+	_, _, err := AssembleMarkdown(config)
+	require.NoError(t, err)
+
+	chapterOne, err := os.ReadFile(filepath.Join(outdir, "002-chapter-one.md"))
+	require.NoError(t, err)
+	text := string(chapterOne)
+	assert.Contains(t, text, "# Chapter One")
+	assert.Contains(t, text, "## foo")
+	assert.Contains(t, text, "## baz")
 }
 
 func TestWriteMetadata(t *testing.T) {

@@ -28,9 +28,9 @@ type FrontMatter struct {
 }
 
 type Chapter struct {
-	Name      string   `yaml:"name"`
+	Name      string   `yaml:"name,omitempty"`
 	Interlude bool     `yaml:"interlude,omitempty"`
-	Subdir    string   `yaml:"subdir"`
+	Subdir    string   `yaml:"subdir,omitempty"`
 	Scenes    []string `yaml:"scenes"`
 }
 

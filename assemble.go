@@ -5,13 +5,15 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 // AssemblyConfig holds the parameters for assembling a manuscript.
 type AssemblyConfig struct {
-	InputFile string
-	OutputDir string
-	WordCount bool
+	InputFile     string
+	OutputDir     string
+	WordCount     bool
+	SceneHeadings bool // include scene filenames as ## headings
 }
 
 // WordCountResult holds the word count for a single scene file.
@@ -63,7 +65,7 @@ func AssembleMarkdown(config AssemblyConfig) (*FrontMatter, []WordCountResult, e
 				})
 			}
 		}
-		if err := WriteMarkdownScenes(fd, chapter.Scenes); err != nil {
+		if err := WriteMarkdownScenes(fd, chapter.Scenes, config.SceneHeadings); err != nil {
 			fd.Close()
 			return nil, nil, err
 		}
@@ -78,10 +80,17 @@ func AssembleMarkdown(config AssemblyConfig) (*FrontMatter, []WordCountResult, e
 }
 
 // WriteMarkdownScenes writes the contents of scene files to fd, separated
-// by scene break markers.
-func WriteMarkdownScenes(fd *os.File, sceneFiles []string) error {
+// by scene break markers. When sceneHeadings is true, each scene is preceded
+// by a ## heading with the scene filename (without extension).
+func WriteMarkdownScenes(fd *os.File, sceneFiles []string, sceneHeadings bool) error {
 	lastSceneIndex := len(sceneFiles) - 1
 	for i, sceneFile := range sceneFiles {
+		if sceneHeadings {
+			name := strings.TrimSuffix(filepath.Base(sceneFile), ".md")
+			if _, err := fmt.Fprintf(fd, "## %s\n\n", name); err != nil {
+				return err
+			}
+		}
 		sceneText, err := os.ReadFile(sceneFile)
 		if err != nil {
 			return err
